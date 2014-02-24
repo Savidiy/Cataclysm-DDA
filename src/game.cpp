@@ -4665,16 +4665,17 @@ void game::draw()
     if(fullscreen) {
       return;
     }
+
+    bool sideStyle = use_narrow_sidebar();
     // Draw Status
     draw_HP();
     werase(w_status);
     werase(w_status2);
     if (!liveview.compact_view) {
-        liveview.hide(true, true);
+        liveview.hide(!sideStyle, true);
     }
     u.disp_status(w_status, w_status2);
 
-    bool sideStyle = use_narrow_sidebar();
 
     WINDOW *time_window = sideStyle ? w_status2 : w_status;
     wmove(time_window, sideStyle ? 0 : 1, sideStyle ? 15 : 41);
