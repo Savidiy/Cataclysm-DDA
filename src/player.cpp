@@ -3210,18 +3210,18 @@ void player::disp_status(WINDOW *w, WINDOW *w2)
 
     int spdx = sideStyle ?  0 : x + dx * 4;
     int spdy = sideStyle ?  5 : y + dy * 4;
-    mvwprintz(w, spdy, spdx, col_spd, _("Spd %2d"), get_speed());
+    mvwprintz(w, spdy, spdx, col_spd, _("Spd %2d  "), get_speed());
     if (this->weight_carried() > this->weight_capacity()) {
-        col_time = h_black;
+        col_time = h_white;
     }
     if (this->volume_carried() > this->volume_capacity() - 2) {
         if (this->weight_carried() > this->weight_capacity()) {
-            col_time = c_dkgray_magenta;
+            col_time = c_black_white;
         } else {
             col_time = c_dkgray_red;
         }
     }
-    wprintz(w, col_time, "  %d", movecounter);
+    wprintz(w, col_time, "%3d", movecounter);
  }
 }
 
