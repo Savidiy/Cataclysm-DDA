@@ -37,7 +37,7 @@
             "id":"line_trail",
             "bg":12
         },
-        
+
         {
             "id":"animation_line",
             "bg":49
@@ -161,6 +161,14 @@
         },
         {
             "id":"t_pit_spiked_covered",
+            "rotates":false
+        },
+        {
+            "id":"t_pit_glass",
+            "rotates":false
+        },
+        {
+            "id":"t_pit_glass_covered",
             "rotates":false
         },
         {
@@ -1287,7 +1295,7 @@
             "rotates":false
         },
         {
-            "id":"mon_zombie_fast",
+            "id":"mon_zombie_dog",
             "fg": 61,
             "rotates":false
         },

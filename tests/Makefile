@@ -1,41 +1,44 @@
 # Make any tests, and possibly run them.
-# A selection of variables are exported from the master Makefile
-# libtap.so and tap.h must be in the local directory or on the system path.
+# A selection of variables are exported from the master Makefile.
 
-# ODIR is realative, so we can use the one from the main Makefile
+# As each test will have a main function we need to handle this file by file.
+# We're using the fairly typical convention that any file ending in _test.cpp
+# is a test executable.
+SOURCES = $(wildcard *.cpp)
+OBJS = $(SOURCES:%.cpp=$(ODIR)/%.o)
 
-# As each test will have a main function we need to handle this file by file
-TEST_SOURCES = $(wildcard *_test.cpp)
-TEST_OBJS = $(TEST_SOURCES:%.cpp=$(ODIR)/%.o)
-TESTS = $(TEST_SOURCES:.cpp=)
+CATA_LIB=../cataclysm.a
 
-# Brute force solution, relative paths to EVERY .o file
-SOURCE_OBJS = $(patsubst %,../$(ODIR)/%,$(filter-out main.o,$(_OBJS)))
+ODIR := obj
 
-LDFLAGS += -L. -ltap -lpthread
+LDFLAGS += -L.
 
-CXXFLAGS += -I..
+# Allow use of any header files from cataclysm.
+# Catch sections throw unused variable warnings.
+# Add no-sign-compare to fix MXE issue when compiling
+# Catch also uses "#pragma gcc diagnostic", which is not recognized on some supported compilers.
+# Clang and mingw are warning about Catch macros around perfectly normal boolean operations.
+CXXFLAGS += -I../src -Wno-unused-variable -Wno-sign-compare -Wno-unknown-pragmas -Wno-parentheses
 
-LD := $(CROSS)g++
+tests: cata_test
 
-tests: $(TESTS)
+cata_test: $(ODIR) $(OBJS)
+	+$(CXX) $(W32FLAGS) -o $@ $(DEFINES) $(OBJS) $(CATA_LIB) $(CXXFLAGS) $(LDFLAGS)
 
-%_test: $(ODIR) $(DDIR) $(SOURCE_OBJS) $(TEST_OBJS)
-	$(LD) $(W32FLAGS) -o $@ $(DEFINES) $(ODIR)/$@.o $(SOURCE_OBJS) $(CXXFLAGS) $(LDFLAGS)
-
-check: $(TESTS)
-	LD_LIBRARY_PATH=/usr/local/lib ./$?
+# Iterate over all the individual tests.
+check: cata_test
+	cd .. && tests/cata_test -d yes
 
 clean:
-	rm -f $(TESTS) *.d $(ODIR)/*.o $(ODIR)/*.d
+	rm -rf $(ODIR)
+	rm -f cata_test
 
 $(ODIR):
 	mkdir $(ODIR)
 
-$(DDIR):
-	@mkdir $(DDIR)
-
 $(ODIR)/%.o: %.cpp
 	$(CXX) $(DEFINES) $(CXXFLAGS) -c $< -o $@
 
-.PHONY: clean
+.PHONY: clean check tests
+
+.SECONDARY: $(OBJS)
