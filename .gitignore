@@ -1,8 +1,10 @@
+tests/cata_test
 cataclysm
 cataclysm-tiles
-chkjson
+chkjson*
 !src/chkjson
 data/*.template
+templates/
 save/
 graveyard/
 memorial/
@@ -13,14 +15,25 @@ bindist/
 cataclysmdda-*
 objwin/
 src/version.h
-lua/catabindings.cpp
+src/lua/catabindings.cpp
 CataclysmWin.cscope_file_list
 CataclysmWin.depend
 CataclysmWin.layout
 *.exe
 *.dll
 WinDepend/
-data/FONTDATA
+*.7z
+*.zip
+build/
+dep/
+
+data/font/
+config/
+
+doxygen_doc/html/*
+doxygen_doc/latex/*
+
+data/mods/user-default-mods.json
 
 # Visual Studio files
 *.suo
@@ -30,6 +43,8 @@ data/FONTDATA
 Release*/
 Debug*/
 *.opensdf
+*.user
+*.vcxproj.filters
 
 # Temporary and backup files
 *~
@@ -48,3 +63,52 @@ cscope.*
 
 # Compiled binary translations
 lang/mo/
+
+# Directory for translatable strings
+lang/json/*
+!lang/json/README
+
+# Netbeans IDE folders
+nbproject/
+
+# Python runtime files
+*.pyc
+
+# vim files
+*.vim
+*.session
+
+# taskwarrior files
+*.task*
+
+# GitEye files
+*.project
+
+# vimdiff backup
+*.orig
+
+# OSX
+Cataclysm.app
+data/osx/AppIcon.icns
+Cataclysm.dmg
+
+# Jetbrains CLion
+.idea/
+
+# linked test executable
+tests/line_test
+tests/map_iterator_test
+tests/shadowcasting_test
+# static library used to link the test executable
+cataclysm.a
+
+# coredumps
+*.core
+
+# sublime-text workspace
+*.sublime-workspace
+
+# Visual Studio 2015
+msvc140/*db
+msvc140/ipch
+lnk*.tmp

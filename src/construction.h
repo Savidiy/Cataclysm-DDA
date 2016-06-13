@@ -1,59 +1,60 @@
-#ifndef _CONSTRUCTION_H_
-#define _CONSTRUCTION_H_
+#ifndef CONSTRUCTION_H
+#define CONSTRUCTION_H
 
-#include "crafting.h"
-#include "json.h"
+#include "requirements.h"
+#include "cursesdef.h" // WINDOW
+#include "enums.h" // point
+#include "string_id.h"
 
-#include <vector>
 #include <string>
+#include <set>
+#include <functional>
 
-struct construct // Construction functions.
-{
-    // Checks for whether terrain mod can proceed
-    bool check_nothing(point) { return true; }
-    bool check_empty(point); // tile is empty
-    bool check_support(point); // at least two orthogonal supports
+class JsonObject;
+typedef int nc_color;
+class Skill;
+using skill_id = string_id<Skill>;
 
-    // Special actions to be run post-terrain-mod
-    void done_nothing(point) {}
-    void done_tree(point);
-    void done_trunk_log(point);
-    void done_trunk_plank(point);
-    void done_vehicle(point);
-    void done_deconstruct(point);
+struct construction {
+        std::string category; //Construction type category
+        std::string description; // how the action is displayed to the player
+        skill_id skill;
+        std::string pre_terrain; // beginning terrain for construction
+        std::string post_terrain;// final terrain after construction
+
+        std::set<std::string> pre_flags; // flags beginning terrain must have
+
+        requirement_data requirements;
+
+        int id; // arbitrary internal identifier
+        int time;
+        int difficulty;
+
+        bool ( *pre_special )( point ); // custom constructability check
+        void ( *post_special )( point ); // custom after-effects
+
+        bool pre_is_furniture; // whether it's furniture or terrain
+        bool post_is_furniture; // whether it's furniture or terrain
+
+        int adjusted_time() const; // NPC assistance adjusted
+        int print_time( WINDOW *w, int ypos, int xpos, int width, nc_color col ) const;
+        std::vector<std::string> get_folded_time_string( int width ) const;
+        float time_scale() const; //result of construction scaling option
+    private:
+        std::string get_time_string() const;
 };
 
-struct construction
-{
-    int id; // arbitrary internal identifier
+//! Set all constructions to take the specified time.
+void standardize_construction_times( int time );
 
-    std::string description; // how the action is displayed to the player
-    std::string skill;
-    int difficulty; // carpentry skill level required
-    int time; // time taken to construct, in minutes
-    std::vector<std::vector<component> > tools; // tools required
-    std::vector<std::vector<component> > components; // components required
+//! Remove all constructions matching the predicate.
+void remove_construction_if( std::function<bool ( construction & )> pred );
 
-    std::string pre_terrain; // beginning terrain for construction
-    bool pre_is_furniture; // whether it's furniture or terrain
-    std::set<std::string> pre_flags; // flags beginning terrain must have
-    bool (construct::*pre_special)(point); // custom constructability check
-
-    void (construct::*post_special)(point); // custom after-effects
-    std::string post_terrain;// final terrain after construction
-    bool post_is_furniture; // whether it's furniture or terrain
-};
-
-extern std::vector<construction*> constructions;
-
-void load_construction(JsonObject &jsobj);
+void load_construction( JsonObject &jsobj );
 void reset_constructions();
 void construction_menu();
-bool player_can_build(player &p, inventory inv, construction *con);
-bool player_can_build(player &p, inventory pinv, const std::string &desc);
-bool can_construct(construction *con, int x, int y);
-bool can_construct(construction *con);
-void place_construction(const std::string &desc);
 void complete_construction();
+void check_constructions();
+void finalize_constructions();
 
-#endif // _CONSTRUCTION_H_
+#endif
